@@ -4,6 +4,7 @@ su
 ./bcasid >/etc/bcasid.inf
 exit
 
+sudo apt install libpcsclite-dev
 cd ../libyakisoba
 make
 su

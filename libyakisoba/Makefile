@@ -1,30 +1,37 @@
 PREFIX = /usr/local
 DEST_HEADER = $(PREFIX)/include/yakisoba
 
-TARGET = libyakisoba.a
-SRCS = Crypto.cpp  Decoder-ECM.cpp  Keys.cpp  Keyset.cpp
+TARGET = libyakisoba.so
+SRCS = Crypto.cpp  Decoder-ECM.cpp  Keys.cpp  Keyset.cpp winscard.cpp
 OBJS = $(subst .cpp,.o,$(SRCS))
 HEADERS = Crypto.h  Decoder.h  Global.h  Keys.h Keyset.h
+CNFPATH = /usr/local/lib/pkgconfig
+CNFFILE = libyakisoba.pc
 
 RM := rm
-CXX := g++
-CC := g++
-AR := ar
+CC := g++ 
 
-CPPFLAGS = -g -fPIC -O2 
-LDFLAGS = -g -fPIC
-ARFLAGS = cr
+PCSCFLAGS = `pkg-config --cflags libpcsclite`
+CPPFLAGS = -g -fPIC -O2 $(PCSCFLAGS)
+LDFLAGS = -g -fPIC -shared
 
 $(TARGET): $(OBJS)
-	$(AR) $(ARFLAGS) $@ $^ $(LOADLIBES)
+▸---$(LINK.o) $^ $(LOADLIBES) -o $@
 
 install: $(TARGET) $(HEADERS)
-	install -m644 $(TARGET) $(PREFIX)/lib/$(TARGET)
-	mkdir -p $(DEST_HEADER)
-	install -m644 $(HEADERS) $(DEST_HEADER)
-	
+▸---install -m644 $(TARGET) $(PREFIX)/lib/$(TARGET)
+▸---mkdir -p $(DEST_HEADER)
+▸---install -m644 $(HEADERS) $(DEST_HEADER)
+▸---mkdir -p $(CNFPATH)
+▸---install -m644 $(CNFFILE) $(CNFPATH) 
+
+uninstall: $(TARGET) $(HEADERS)
+▸---$(RM) $(PREFIX)/lib/$(TARGET)
+▸---$(RM) $(CNFPATH)/$(CNFFILE) 
+▸---$(RM) -rf $(DEST_HEADER)
+
 .PHONY: clean
 
 clean:
-	$(RM) $(OBJS) $(TARGET)
+▸---$(RM) $(OBJS) $(TARGET)
 
